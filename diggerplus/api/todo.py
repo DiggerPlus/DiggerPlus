@@ -25,13 +25,15 @@ class TODOS(MethodView):
     url_rules = ['/todos/<title>', '/todos']
     logger = logger
 
+    shields = ['created_at', 'updated_at']
+
     def get(self, title=None):
         if title is None:
             todos = TODOModel.get_all()
-            return status_OK([todo.to_dict() for todo in todos])
+            return status_OK([todo.to_dict(self.shields) for todo in todos])
         todo = TODOModel.get_by_title(title)
         if todo:
-            return status_OK(todo.to_dict())
+            return status_OK(todo.to_dict(self.shields))
         raise NotFoundException("TODO: {!r} not found!".format(title))
 
     def post(self, title=None):
