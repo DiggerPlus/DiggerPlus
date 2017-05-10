@@ -2,15 +2,13 @@
 
 import logging
 
-from flask import Blueprint
-
 from diggerplus import __version__
-from .base import status_OK, MethodView
+from .base import status_OK, MethodView, Blueprint_v1
 
 
 logger = logging.getLogger(__name__)
 
-bp = Blueprint('ping', __name__, url_prefix='/api')
+bp = Blueprint_v1('ping', __name__)
 
 
 class Ping(MethodView):

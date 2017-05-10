@@ -6,7 +6,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from werkzeug.local import Local
 from werkzeug.exceptions import HTTPException
-from flask import current_app, request, json
+from flask import current_app, request, json, Blueprint
 from flask.views import View
 
 from ..exc import EmptyFieldsException
@@ -140,3 +140,15 @@ class MethodView(ParserMixin, View):
         meth = getattr(self, request.method.lower(), None)
         assert meth is not None, "Unimplemented method %r" % meth
         return meth(*args, **kwargs)
+
+
+class Blueprint_v1(Blueprint):
+    """Api version v1.
+
+    api: http://host:port/api/v1/your_api
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(Blueprint_v1, self).__init__(
+            *args, url_prefix='/api/v1', **kwargs
+        )
