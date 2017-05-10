@@ -2,13 +2,12 @@
 
 import logging
 
-from flask import Blueprint
-
 from .base import (
     status_OK,
     status_Created,
     status_ResetContent,
     MethodView,
+    Blueprint_v1
 )
 from ..models.todo import TODOModel
 from ..exc import NotFoundException, ExistedException
@@ -17,7 +16,7 @@ from ..consts import ALREADY_EXISTS_MESSSAGE
 logger = logging.getLogger(__name__)
 
 
-bp = Blueprint('todos', __name__, url_prefix='/api')
+bp = Blueprint_v1('todos', __name__)
 
 
 class TODOS(MethodView):
