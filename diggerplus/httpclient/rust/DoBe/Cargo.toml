@@ -1,0 +1,7 @@
+[package]
+name = "DoBe"
+version = "0.1.0"
+authors = ["kiven <kiven.mr@gmail.com>"]
+
+[dependencies]
+hyper = "0.10"
