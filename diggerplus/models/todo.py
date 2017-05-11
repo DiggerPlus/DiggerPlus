@@ -18,4 +18,4 @@ class TODOModel(Model):
 
     @classmethod
     def get_by_title(cls, title):
-        return cls.query.filter(cls.title==title).first()
+        return cls.from_cache().filter(cls.title==title).first()

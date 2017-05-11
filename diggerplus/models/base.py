@@ -2,20 +2,34 @@
 
 import math
 import datetime
+import hashlib
 
+from dogpile.cache.region import make_region
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy import (
-    orm,
     Column,
     BigInteger,
     DateTime,
 )
 
 from diggerplus.db import mode_base, db_manager
+from diggerplus.settings import cache_config
+from .cache.caching_query import CachingQuery, FromCache
 
 
 ModelBase = mode_base()
 DBSession = db_manager.get_session('diggerplus')
+
+
+def md5_key_mangler(key):
+    if key.startswith('SELECT '):
+        key = hashlib.md5(key.encode('ascii')).hexdigest()
+    return key
+
+
+regions = dict(
+    default=make_region(key_mangler=md5_key_mangler).configure(**cache_config)
+)
 
 
 class Pagination(object):
@@ -119,7 +133,7 @@ class Pagination(object):
                 last = num
 
 
-class Query(orm.Query):
+class Query(CachingQuery):
     """SQLAlchemy :class:`~sqlalchemy.orm.query.Query` subclass with
     convenience methods for querying in a web application. This is the
     default :attr:`~Model.query` object used for models, and exposed as
@@ -137,10 +151,21 @@ class Query(orm.Query):
         return Pagination(self, page, per_page, total, items)
 
 
+def query_callable(regions, query_cls=Query):
+    def query(*args, **kwargs):
+        return query_cls(regions, *args, **kwargs)
+    return query
+
+
 class Model(ModelBase):
 
     __abstract__ = True
-    query = DBSession.query_property(query_cls=Query)
+    query = DBSession.query_property(query_cls=query_callable(regions))
+
+    @classmethod
+    def from_cache(cls):
+        """query from cache, set cache if missing."""
+        return cls.query.options(FromCache())
 
     @declared_attr
     def id(cls):
