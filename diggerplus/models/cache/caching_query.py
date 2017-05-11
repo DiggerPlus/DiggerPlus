@@ -22,6 +22,7 @@ dogpile.cache constructs.
 from sqlalchemy.orm.interfaces import MapperOption
 from sqlalchemy.orm.query import Query
 from dogpile.cache.api import NO_VALUE
+from redis.exceptions import ConnectionError
 
 
 class CachingQuery(Query):
@@ -60,9 +61,12 @@ class CachingQuery(Query):
 
         """
         if hasattr(self, '_cache_region'):
-            return self.get_value(createfunc=lambda: list(Query.__iter__(self)))
-        else:
-            return Query.__iter__(self)
+            try:
+                return self.get_value(createfunc=lambda: list(Query.__iter__(self)))
+            except ConnectionError:
+                """get from query if backend server down"""
+                return Query.__iter__(self)
+        return Query.__iter__(self)
 
     def _get_cache_plus_key(self):
         """Return a cache region plus key."""
@@ -226,5 +230,3 @@ class RelationshipCache(MapperOption):
         """
         self._relationship_options.update(option._relationship_options)
         return self
-
-
