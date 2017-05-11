@@ -1,6 +1,15 @@
 Diggerplus Changelog
 ====================
 
+0.2.0
+-----
+
+* Fix: Fix parse request data. (#18)
+* Enhance: Enhance `to_dict`. (#19)
+* Feature: Add shield fields for `to_dict`. (#20)
+* Feature: Add api version support. (#21)
+* Feature: Query cache support. (#22)
+
 
 0.1.0
 -----
