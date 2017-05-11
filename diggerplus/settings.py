@@ -18,3 +18,8 @@ DB_SETTINGS = {
         "pool_recycle": 1200
     }
 }
+
+cache_config = {
+    'backend': 'dogpile.cache.redis',
+    'expiration_time': 3600  # 1 hour
+}
